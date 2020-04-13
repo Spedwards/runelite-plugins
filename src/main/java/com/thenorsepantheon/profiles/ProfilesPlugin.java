@@ -21,7 +21,7 @@ import java.awt.image.BufferedImage;
 )
 public class ProfilesPlugin extends Plugin
 {
-	
+
 	@Inject
 	private Client client;
 
@@ -50,11 +50,11 @@ public class ProfilesPlugin extends Plugin
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "profiles_icon.png");
 
 		navButton = NavigationButton.builder()
-				.tooltip("Profiles")
-				.priority(8)
-				.icon(icon)
-				.panel(panel)
-				.build();
+			.tooltip("Profiles")
+			.priority(8)
+			.icon(icon)
+			.panel(panel)
+			.build();
 
 		clientToolbar.addNavigation(navButton);
 	}

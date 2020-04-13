@@ -10,10 +10,10 @@ public interface ProfilesConfig extends Config
 {
 
 	@ConfigItem(
-			keyName = "profilesData",
-			name = "",
-			description = "",
-			hidden = true
+		keyName = "profilesData",
+		name = "",
+		description = "",
+		hidden = true
 	)
 	default String profilesData()
 	{
@@ -21,16 +21,16 @@ public interface ProfilesConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "profilesData",
-			name = "",
-			description = ""
+		keyName = "profilesData",
+		name = "",
+		description = ""
 	)
 	void profilesData(String str);
 
 	@ConfigItem(
-			keyName = "streamerMode",
-			name = "Streamer Mode",
-			description = "Hides your account emails"
+		keyName = "streamerMode",
+		name = "Streamer Mode",
+		description = "Hides your account emails"
 	)
 	default boolean isStreamerMode()
 	{
