@@ -34,10 +34,9 @@ class ProfilePanel extends JPanel
 
     private final String loginText;
 
-    ProfilePanel(final Client client, String data, ProfilesConfig config)
+    ProfilePanel(final Client client, Profile profile, ProfilesConfig config)
     {
-        String[] parts = data.split(":");
-        this.loginText = parts[1];
+        this.loginText = profile.getLogin();
 
         final ProfilePanel panel = this;
 
@@ -64,7 +63,8 @@ class ProfilePanel extends JPanel
             public void mousePressed(MouseEvent e)
             {
                 panel.getParent().remove(panel);
-                ProfilesPanel.removeProfile(data);
+                Profile.getProfiles().removeIf(p -> p.getLabel().equals(profile.getLabel())
+					&& p.getLogin().equals(profile.getLogin()));
             }
 
             @Override
@@ -83,7 +83,7 @@ class ProfilePanel extends JPanel
         panelActions.add(delete, BorderLayout.EAST);
 
         JLabel label = new JLabel();
-        label.setText(parts[0]);
+        label.setText(profile.getLabel());
         label.setBorder(null);
         label.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         label.setPreferredSize(new Dimension(0, 24));

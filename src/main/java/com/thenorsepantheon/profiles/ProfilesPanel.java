@@ -8,6 +8,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.Arrays;
 import javax.inject.Inject;
 import javax.swing.JButton;
@@ -38,7 +39,7 @@ class ProfilesPanel extends PluginPanel
     private GridBagConstraints c;
 
     @Inject
-    public ProfilesPanel(Client client, ProfilesConfig config)
+    public ProfilesPanel(Client client, ProfilesConfig config) throws IOException
     {
         super();
         this.client = client;
@@ -136,10 +137,16 @@ class ProfilesPanel extends PluginPanel
             {
                 return;
             }
-            String data = labelText + ":" + loginText;
-            this.addAccount(data);
-
-            addProfile(data);
+            Profile profile = new Profile(labelText, loginText);
+            this.addProfile(profile);
+            try
+			{
+				ProfilesStorage.saveProfiles();
+			}
+            catch (IOException ex)
+			{
+				ex.printStackTrace();
+			}
 
             txtAccountLabel.setText(ACCOUNT_LABEL);
             txtAccountLabel.setForeground(ColorScheme.MEDIUM_GRAY_COLOR);
@@ -170,47 +177,48 @@ class ProfilesPanel extends PluginPanel
         c.gridy = 0;
         c.insets = new Insets(0, 0, 5, 0);
 
-        addAccounts(config.profilesData());
+        migrateFromConfig(); // TODO: Remove in a later version
+
+		Profile.getProfiles().forEach(this::addProfile);
     }
 
     void redrawProfiles()
     {
         profilesPanel.removeAll();
         c.gridy = 0;
-        addAccounts(profilesConfig.profilesData());
+        Profile.getProfiles().forEach(this::addProfile);
     }
 
-    private void addAccount(String data)
-    {
-        ProfilePanel profile = new ProfilePanel(client, data, profilesConfig);
-        c.gridy++;
-        profilesPanel.add(profile, c);
+    private void addProfile(Profile profile)
+	{
+		ProfilePanel profilePanel = new ProfilePanel(client, profile, profilesConfig);
+		c.gridy++;
+		profilesPanel.add(profilePanel, c);
 
-        revalidate();
-        repaint();
-    }
+		revalidate();
+		repaint();
+	}
 
-    void addAccounts(String data)
-    {
-        data = data.trim();
-        if (!data.contains(":"))
-        {
-            revalidate();
-            repaint();
-            return;
-        }
-        Arrays.stream(data.split("\\n")).forEach(this::addAccount);
-    }
+	private void migrateFromConfig() throws IOException
+	{
+		String data = profilesConfig.profilesData().trim();
+		if (!data.contains(":"))
+		{
+			revalidate();
+			repaint();
+			return;
+		}
+		Arrays.stream(data.split("\\n")).forEach(acc ->
+		{
+			String[] parts = acc.split(":");
+			Profile profile = new Profile(parts[0], parts[1]);
+			this.addProfile(profile);
+		});
 
-    static void addProfile(String data)
-    {
-        profilesConfig.profilesData(
-                profilesConfig.profilesData() + data + "\n");
-    }
+		// Clear profiles out of config
+		profilesConfig.profilesData("");
 
-    static void removeProfile(String data)
-    {
-        profilesConfig.profilesData(
-                profilesConfig.profilesData().replaceAll(data + "\n", ""));
-    }
+		// Save migrated profiles
+		ProfilesStorage.saveProfiles();
+	}
 }

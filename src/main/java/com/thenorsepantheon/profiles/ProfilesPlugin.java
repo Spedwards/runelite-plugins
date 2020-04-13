@@ -43,6 +43,7 @@ public class ProfilesPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
+		ProfilesStorage.loadProfiles();
 
 		panel = new ProfilesPanel(client, config);
 
