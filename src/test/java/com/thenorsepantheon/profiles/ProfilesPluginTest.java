@@ -1,4 +1,4 @@
-package com.profiles.Profiles;
+package com.thenorsepantheon.profiles;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
