@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -58,7 +59,7 @@ class ProfilePanel extends JPanel
 
 	private final String loginText;
 
-	ProfilePanel(final Client client, Profile profile, ProfilesConfig config)
+	ProfilePanel(final Client client, Profile profile, ProfilesConfig config, ProfilesPanel parent)
 	{
 		this.loginText = profile.getLogin();
 
@@ -83,12 +84,15 @@ class ProfilePanel extends JPanel
 		delete.setToolTipText("Delete account profile");
 		delete.addMouseListener(new MouseAdapter()
 		{
+			@SneakyThrows
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
 				panel.getParent().remove(panel);
 				Profile.getProfiles().removeIf(p -> p.getLabel().equals(profile.getLabel())
 					&& p.getLogin().equals(profile.getLogin()));
+				ProfilesStorage.saveProfiles();
+				parent.repaint();
 			}
 
 			@Override

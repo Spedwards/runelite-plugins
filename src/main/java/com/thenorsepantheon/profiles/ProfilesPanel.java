@@ -215,7 +215,7 @@ class ProfilesPanel extends PluginPanel
 
 	private void addProfile(Profile profile)
 	{
-		ProfilePanel profilePanel = new ProfilePanel(client, profile, profilesConfig);
+		ProfilePanel profilePanel = new ProfilePanel(client, profile, profilesConfig, this);
 		c.gridy++;
 		profilesPanel.add(profilePanel, c);
 
