@@ -201,8 +201,6 @@ class ProfilesPanel extends PluginPanel
 		c.gridy = 0;
 		c.insets = new Insets(0, 0, 5, 0);
 
-		migrateFromConfig(); // TODO: Remove in a later version
-
 		Profile.getProfiles().forEach(this::addProfile);
 	}
 
@@ -221,28 +219,5 @@ class ProfilesPanel extends PluginPanel
 
 		revalidate();
 		repaint();
-	}
-
-	private void migrateFromConfig() throws IOException
-	{
-		String data = profilesConfig.profilesData().trim();
-		if (!data.contains(":"))
-		{
-			revalidate();
-			repaint();
-			return;
-		}
-		Arrays.stream(data.split("\\n")).forEach(acc ->
-		{
-			String[] parts = acc.split(":");
-			Profile profile = new Profile(parts[0], parts[1]);
-			this.addProfile(profile);
-		});
-
-		// Clear profiles out of config
-		profilesConfig.profilesData("");
-
-		// Save migrated profiles
-		ProfilesStorage.saveProfiles();
 	}
 }
