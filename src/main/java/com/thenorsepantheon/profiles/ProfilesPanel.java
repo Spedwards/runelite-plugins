@@ -24,21 +24,17 @@
  */
 package com.thenorsepantheon.profiles;
 
-import java.awt.Dimension;
+import com.thenorsepantheon.profiles.ui.Button;
+import com.thenorsepantheon.profiles.ui.PasswordField;
+import com.thenorsepantheon.profiles.ui.TextField;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.util.Arrays;
 import javax.inject.Inject;
-import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -51,19 +47,17 @@ class ProfilesPanel extends PluginPanel
 
 	private static final String ACCOUNT_USERNAME = "Account Username";
 	private static final String ACCOUNT_LABEL = "Account Label";
-	private static final Dimension PREFERRED_SIZE = new Dimension(PluginPanel.PANEL_WIDTH - 20, 30);
-	private static final Dimension MINIMUM_SIZE = new Dimension(0, 30);
 
 	private final Client client;
 	private static ProfilesConfig profilesConfig;
 
-	private final JTextField txtAccountLabel = new JTextField(ACCOUNT_LABEL);
-	private final JPasswordField txtAccountLogin = new JPasswordField(ACCOUNT_USERNAME);
+	private final TextField txtAccountLabel = new TextField(ACCOUNT_LABEL);
+	private final PasswordField txtAccountLogin;
 	private final JPanel profilesPanel = new JPanel();
-	private GridBagConstraints c;
+	private final GridBagConstraints c;
 
 	@Inject
-	public ProfilesPanel(Client client, ProfilesConfig config) throws IOException
+	public ProfilesPanel(Client client, ProfilesConfig config)
 	{
 		super();
 		this.client = client;
@@ -81,78 +75,16 @@ class ProfilesPanel extends PluginPanel
 		c.weighty = 0;
 		c.insets = new Insets(0, 0, 3, 0);
 
-		txtAccountLabel.setPreferredSize(PREFERRED_SIZE);
-		txtAccountLabel.setForeground(ColorScheme.MEDIUM_GRAY_COLOR);
-		txtAccountLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		txtAccountLabel.setMinimumSize(MINIMUM_SIZE);
-		txtAccountLabel.addFocusListener(new FocusListener()
-		{
-			@Override
-			public void focusGained(FocusEvent e)
-			{
-				if (txtAccountLabel.getText().equals(ACCOUNT_LABEL))
-				{
-					txtAccountLabel.setText("");
-					txtAccountLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-				}
-			}
-
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				if (txtAccountLabel.getText().isEmpty())
-				{
-					txtAccountLabel.setForeground(ColorScheme.MEDIUM_GRAY_COLOR);
-					txtAccountLabel.setText(ACCOUNT_LABEL);
-				}
-			}
-		});
-
 		add(txtAccountLabel, c);
 		c.gridy++;
 
-		// Do not hide username characters until they focus or if in streamer mode
-		txtAccountLogin.setEchoChar((char) 0);
-		txtAccountLogin.setPreferredSize(PREFERRED_SIZE);
-		txtAccountLogin.setForeground(ColorScheme.MEDIUM_GRAY_COLOR);
-		txtAccountLogin.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		txtAccountLogin.setMinimumSize(MINIMUM_SIZE);
-		txtAccountLogin.addFocusListener(new FocusListener()
-		{
-			@Override
-			public void focusGained(FocusEvent e)
-			{
-				if (ACCOUNT_USERNAME.equals(String.valueOf(txtAccountLogin.getPassword())))
-				{
-					txtAccountLogin.setText("");
-					if (config.isStreamerMode())
-					{
-						txtAccountLogin.setEchoChar('*');
-					}
-					txtAccountLogin.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-				}
-			}
-
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				if (txtAccountLogin.getPassword().length == 0)
-				{
-					txtAccountLogin.setForeground(ColorScheme.MEDIUM_GRAY_COLOR);
-					txtAccountLogin.setText(ACCOUNT_USERNAME);
-					txtAccountLogin.setEchoChar((char) 0);
-				}
-			}
-		});
+		txtAccountLogin = new PasswordField(ACCOUNT_USERNAME, profilesConfig.isStreamerMode());
 
 		add(txtAccountLogin, c);
 		c.gridy++;
 		c.insets = new Insets(0, 0, 15, 0);
 
-		JButton btnAddAccount = new JButton("Add Account");
-		btnAddAccount.setPreferredSize(PREFERRED_SIZE);
-		btnAddAccount.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		btnAddAccount.setMinimumSize(MINIMUM_SIZE);
+		Button btnAddAccount = new Button("Add Account");
 		btnAddAccount.addActionListener(e ->
 		{
 			String labelText = txtAccountLabel.getText();
@@ -172,12 +104,8 @@ class ProfilesPanel extends PluginPanel
 				ex.printStackTrace();
 			}
 
-			txtAccountLabel.setText(ACCOUNT_LABEL);
-			txtAccountLabel.setForeground(ColorScheme.MEDIUM_GRAY_COLOR);
-
-			txtAccountLogin.setText(ACCOUNT_USERNAME);
-			txtAccountLogin.setEchoChar((char) 0);
-			txtAccountLogin.setForeground(ColorScheme.MEDIUM_GRAY_COLOR);
+			txtAccountLabel.resetState();
+			txtAccountLogin.resetState();
 		});
 
 		txtAccountLogin.addKeyListener(new KeyAdapter()
@@ -206,6 +134,7 @@ class ProfilesPanel extends PluginPanel
 
 	void redrawProfiles()
 	{
+		txtAccountLogin.setObfuscate(profilesConfig.isStreamerMode());
 		profilesPanel.removeAll();
 		c.gridy = 0;
 		Profile.getProfiles().forEach(this::addProfile);

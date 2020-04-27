@@ -22,25 +22,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.thenorsepantheon.profiles;
+package com.thenorsepantheon.profiles.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-import lombok.Getter;
+import static com.thenorsepantheon.profiles.ui.Fields.PREFERRED_SIZE;
+import static com.thenorsepantheon.profiles.ui.Fields.MINIMUM_SIZE;
+import static com.thenorsepantheon.profiles.ui.Fields.BACKGROUND_COLOUR;
+import javax.swing.JButton;
 
-@Getter
-public class Profile
+public class Button extends JButton
 {
-	@Getter
-	private static final List<Profile> profiles = new ArrayList<>();
-
-	private final String label;
-	private final String login;
-
-	public Profile(String label, String login)
+	public Button(String label)
 	{
-		this.label = label;
-		this.login = login;
-		profiles.add(this);
+		super(label);
+
+		this.setPreferredSize(PREFERRED_SIZE);
+		this.setMinimumSize(MINIMUM_SIZE);
+		this.setBackground(BACKGROUND_COLOUR);
 	}
 }
