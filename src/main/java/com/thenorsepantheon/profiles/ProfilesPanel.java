@@ -35,6 +35,7 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import javax.inject.Inject;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -45,14 +46,18 @@ import net.runelite.client.ui.PluginPanel;
 class ProfilesPanel extends PluginPanel
 {
 
+	private static final String ENCRYPTION_PASSWORD = "Encryption Password";
 	private static final String ACCOUNT_USERNAME = "Account Username";
+	private static final String ACCOUNT_PASSWORD = "Account Password (optional)";
 	private static final String ACCOUNT_LABEL = "Account Label";
 
 	private final Client client;
 	private static ProfilesConfig profilesConfig;
 
+	private final PasswordField pswdEncryptionPassword = new PasswordField(ENCRYPTION_PASSWORD);
 	private final TextField txtAccountLabel = new TextField(ACCOUNT_LABEL);
 	private final PasswordField txtAccountLogin;
+	private final PasswordField pswdAccountPassword = new PasswordField(ACCOUNT_PASSWORD);
 	private final JPanel profilesPanel = new JPanel();
 	private final GridBagConstraints c;
 
@@ -75,12 +80,48 @@ class ProfilesPanel extends PluginPanel
 		c.weighty = 0;
 		c.insets = new Insets(0, 0, 3, 0);
 
+		add(pswdEncryptionPassword, c);
+		c.gridy++;
+
+		// Declare before button so it can be removed easily
+		JSeparator separator = new JSeparator();
+
+		Button btnDecryptPasswords = new Button("Decrypt Passwords");
+		btnDecryptPasswords.addActionListener(e ->
+		{
+			Profile.setEncryptionPassword(String.valueOf(pswdEncryptionPassword.getPassword()));
+			Profile.decryptPasswords();
+
+			// Passwords have been decrypted for the session. Components can be removed.
+			this.remove(pswdEncryptionPassword);
+			this.remove(btnDecryptPasswords);
+			this.remove(separator);
+			repaint();
+			revalidate();
+
+			// Enable account password field
+			pswdAccountPassword.setEnabled(true);
+			pswdAccountPassword.setToolTipText(null);
+		});
+
+		add(btnDecryptPasswords, c);
+		c.gridy++;
+
+		add(separator, c);
+		c.gridy++;
+
 		add(txtAccountLabel, c);
 		c.gridy++;
 
 		txtAccountLogin = new PasswordField(ACCOUNT_USERNAME, profilesConfig.isStreamerMode());
 
 		add(txtAccountLogin, c);
+		c.gridy++;
+
+		pswdAccountPassword.setEnabled(false);
+		pswdAccountPassword.setToolTipText("Disabled until encryption key is set.");
+
+		add(pswdAccountPassword, c);
 		c.gridy++;
 		c.insets = new Insets(0, 0, 15, 0);
 
@@ -89,11 +130,16 @@ class ProfilesPanel extends PluginPanel
 		{
 			String labelText = txtAccountLabel.getText();
 			String loginText = String.valueOf(txtAccountLogin.getPassword());
+			String passwordText = String.valueOf(pswdAccountPassword.getPassword());
 			if (labelText.equals(ACCOUNT_LABEL) || loginText.equals(ACCOUNT_USERNAME))
 			{
 				return;
 			}
-			Profile profile = new Profile(labelText, loginText);
+			if (passwordText.equals(ACCOUNT_PASSWORD))
+			{
+				passwordText = null;
+			}
+			Profile profile = new Profile(labelText, loginText, passwordText, Profile.getEncryptionPassword() == null);
 			this.addProfile(profile);
 			try
 			{
@@ -106,6 +152,7 @@ class ProfilesPanel extends PluginPanel
 
 			txtAccountLabel.resetState();
 			txtAccountLogin.resetState();
+			pswdAccountPassword.resetState();
 		});
 
 		txtAccountLogin.addKeyListener(new KeyAdapter()

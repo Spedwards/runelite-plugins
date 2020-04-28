@@ -120,22 +120,12 @@ class ProfilePanel extends JPanel
 
 		labelWrapper.add(label, BorderLayout.CENTER);
 		labelWrapper.add(panelActions, BorderLayout.EAST);
-		label.addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mousePressed(MouseEvent e)
-			{
-				if (SwingUtilities.isLeftMouseButton(e) && client.getGameState() == GameState.LOGIN_SCREEN)
-				{
-					client.setUsername(loginText);
-				}
-			}
-		});
 
 		JPanel bottomContainer = new JPanel(new BorderLayout());
 		bottomContainer.setBorder(new EmptyBorder(8, 0, 8, 0));
 		bottomContainer.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		bottomContainer.addMouseListener(new MouseAdapter()
+
+		MouseAdapter clickAdapter = new MouseAdapter()
 		{
 			@Override
 			public void mousePressed(MouseEvent e)
@@ -144,8 +134,18 @@ class ProfilePanel extends JPanel
 				{
 					client.setUsername(loginText);
 				}
+				if (profile.getPassword() != null && !profile.isEncrypted())
+				{
+					client.setPassword(profile.getPassword());
+				}
+				else
+				{
+					client.setPassword("");
+				}
 			}
-		});
+		};
+		label.addMouseListener(clickAdapter);
+		bottomContainer.addMouseListener(clickAdapter);
 
 		JLabel login = new JLabel();
 		login.setText(config.isStreamerMode() ? "Hidden email" : loginText);

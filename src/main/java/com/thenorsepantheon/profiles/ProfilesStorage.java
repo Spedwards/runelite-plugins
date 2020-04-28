@@ -41,6 +41,8 @@ import net.runelite.client.RuneLite;
 public class ProfilesStorage
 {
 	private static final File PROFILES;
+	// loadProfiles is getting called twice from plugin startUp. This ensures it only gets called once.
+	private static boolean hasLoaded = false;
 
 	static
 	{
@@ -54,13 +56,17 @@ public class ProfilesStorage
 
 		Gson gson = new Gson();
 		Writer writer = new FileWriter(file);
-		gson.toJson(Profile.getProfiles(), writer);
+		List<Profile> profiles = Profile.getProfiles();
+		profiles.forEach(Profile::encrypt);
+		gson.toJson(profiles, writer);
 		writer.flush();
 		writer.close();
+		profiles.forEach(Profile::decrypt);
 	}
 
 	static void loadProfiles() throws IOException
 	{
+		if (hasLoaded) return;
 		File file = new File(PROFILES, "profiles.json");
 		if (!file.exists())
 		{
@@ -73,6 +79,8 @@ public class ProfilesStorage
 
 		Gson gson = new Gson();
 		List<Profile> profiles = gson.fromJson(new FileReader(file), new TypeToken<List<Profile>>(){}.getType());
-		profiles.forEach(p -> new Profile(p.getLabel(), p.getLogin()));
+		profiles.forEach(p -> new Profile(p.getLabel(), p.getLogin(), p.getPassword()));
+
+		hasLoaded = true;
 	}
 }

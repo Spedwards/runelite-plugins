@@ -6,4 +6,4 @@ Each login you store can be given an alias to make it easy to associate with an 
 
 Enabling streamer mode hides the logins on the profiles panel, showing only the alias for each account.
 
-Passwords are **not** stored by this plugin.
+Password support requires you use an encryption key that is not saved anywhere. You do not require entering a password to use this plugin and all passwords are encrypted before being saved.
