@@ -1,1 +1,2 @@
-External plugins for Runelite by Spedwards. Check repo branches for individual plugins.
+# Calculator
+Adds a calculator panel
