@@ -44,8 +44,6 @@ public class CalculatorPanel extends JPanel
 		PLUS_MINUS_ICON = new ImageIcon(plusMinusIcon);
 	}
 
-	private final Map<String, CalculatorButton> buttonMap = new HashMap<>();
-
 	private final CalculatorPluginPanel panel;
 	private final DisplayField displayField;
 
@@ -78,7 +76,6 @@ public class CalculatorPanel extends JPanel
 		addButton("/");
 		addButton("0");
 		add(plusMinus);
-		buttonMap.put("plusMinus", plusMinus);
 		addButton("=");
 
 		plusMinus.addActionListener(e ->
@@ -131,11 +128,13 @@ public class CalculatorPanel extends JPanel
 					// Divide by 0 error occured
 					return;
 				}
+				// Add new calculation to history before the displayField is updated
 				panel.getHistoryPanel().addHistoryItem(displayField.getText() + " =", displayField.getResult().toString());
 			}
 			else if (StringUtils.isNumeric(text))
 			{
 				int num = Integer.parseInt(text);
+				// Previous calculation has finised. Start again
 				if (displayField.isFinished())
 				{
 					displayField.reset();
@@ -144,6 +143,7 @@ public class CalculatorPanel extends JPanel
 				}
 				else
 				{
+					// If there is no action saved, assume we're working with num1
 					if (displayField.getCalculatorAction() == null)
 					{
 						Integer num1 = displayField.getNum1();
@@ -194,6 +194,8 @@ public class CalculatorPanel extends JPanel
 			}
 			else
 			{
+				// If the calculation is finished and there's a previous result to work from,
+				// set num1 as the previous result and continue
 				if (displayField.isFinished() && displayField.getPreviousResult() != null)
 				{
 					displayField.reset();
@@ -223,7 +225,6 @@ public class CalculatorPanel extends JPanel
 			}
 			displayField.update();
 		});
-		buttonMap.put(key, btn);
 		add(btn);
 	}
 }

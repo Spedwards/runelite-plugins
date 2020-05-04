@@ -37,17 +37,15 @@ import net.runelite.client.util.ImageUtil;
 
 @Slf4j
 @PluginDescriptor(
-	name = "calculator"
+	name = "calculator",
+	description = "Adds a calculator panel",
+	tags = {"math"}
 )
 public class CalculatorPlugin extends Plugin
 {
 	@Inject
-	private Client client;
-
-	@Inject
 	private ClientToolbar clientToolbar;
 
-	private CalculatorPluginPanel panel;
 	private NavigationButton navButton;
 
 	@Override
@@ -55,7 +53,7 @@ public class CalculatorPlugin extends Plugin
 	{
 		log.info("calculator started!");
 
-		panel = new CalculatorPluginPanel(client);
+		CalculatorPluginPanel panel = new CalculatorPluginPanel();
 
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "icon.png");
 

@@ -31,20 +31,15 @@ import net.runelite.client.ui.PluginPanel;
 
 public class CalculatorPluginPanel extends PluginPanel
 {
-	private final Client client;
-
 	private final DisplayPanel displayPanel = new DisplayPanel();
-	private final CalculatorPanel calculatorPanel;
 	@Getter
 	private final HistoryPanel historyPanel = new HistoryPanel();
 
-	public CalculatorPluginPanel(Client client)
+	public CalculatorPluginPanel()
 	{
 		super();
 
-		calculatorPanel = new CalculatorPanel(this);
-
-		this.client = client;
+		CalculatorPanel calculatorPanel = new CalculatorPanel(this);
 
 		setLayout(new BorderLayout(5, 5));
 
