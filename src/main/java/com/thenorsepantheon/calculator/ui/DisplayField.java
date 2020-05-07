@@ -93,6 +93,13 @@ public class DisplayField extends JTextField
 		update();
 	}
 
+	protected void clear()
+	{
+		reset();
+		finished = true;
+		previousResult = null;
+	}
+
 	protected void update()
 	{
 		if (num1 == null)

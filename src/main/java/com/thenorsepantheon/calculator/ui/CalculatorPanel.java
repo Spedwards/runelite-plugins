@@ -25,7 +25,10 @@
 package com.thenorsepantheon.calculator.ui;
 
 import com.thenorsepantheon.calculator.CalculatorPlugin;
-import java.awt.GridLayout;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +40,9 @@ import org.apache.commons.lang3.StringUtils;
 public class CalculatorPanel extends JPanel
 {
 	private static final ImageIcon PLUS_MINUS_ICON;
+	private static final Insets INSETS_LEFT_BORDER = new Insets(1, 0, 1, 1);
+	private static final Insets INSETS_RIGHT_BORDER = new Insets(1, 1, 1, 0);
+	private static final Insets INSETS = new Insets(1, 1, 1, 1);
 
 	static
 	{
@@ -46,6 +52,7 @@ public class CalculatorPanel extends JPanel
 
 	private final CalculatorPluginPanel panel;
 	private final DisplayField displayField;
+	private final GridBagConstraints c;
 
 	protected CalculatorPanel(CalculatorPluginPanel panel)
 	{
@@ -54,7 +61,12 @@ public class CalculatorPanel extends JPanel
 		this.panel = panel;
 		this.displayField = panel.getDisplayField();
 
-		setLayout(new GridLayout(4, 4, 4, 4));
+		setLayout(new GridBagLayout());
+
+		c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
 
 		CalculatorButton plusMinus = new CalculatorButton(PLUS_MINUS_ICON);
 
@@ -75,8 +87,12 @@ public class CalculatorPanel extends JPanel
 		
 		addButton("/");
 		addButton("0");
-		add(plusMinus);
+		addComp(plusMinus);
 		addButton("=");
+
+		addButton("C");
+		c.gridwidth = 3;
+		addButton("Clear History");
 
 		plusMinus.addActionListener(e ->
 		{
@@ -130,6 +146,16 @@ public class CalculatorPanel extends JPanel
 				}
 				// Add new calculation to history before the displayField is updated
 				panel.getHistoryPanel().addHistoryItem(displayField.getText() + " =", displayField.getResult().toString());
+			}
+			else if (text.equals("C"))
+			{
+				displayField.clear();
+				return;
+			}
+			else if (text.equals("Clear History"))
+			{
+				panel.getHistoryPanel().clearHistory();
+				return;
 			}
 			else if (StringUtils.isNumeric(text))
 			{
@@ -225,6 +251,28 @@ public class CalculatorPanel extends JPanel
 			}
 			displayField.update();
 		});
-		add(btn);
+		addComp(btn);
+	}
+
+	private void addComp(Component component)
+	{
+		switch (c.gridx)
+		{
+			case 0:
+				c.insets = INSETS_LEFT_BORDER;
+				break;
+			case 3:
+				c.insets = INSETS_RIGHT_BORDER;
+				break;
+			default:
+				c.insets = INSETS;
+		}
+		if (c.gridwidth == 3)
+		{
+			c.insets = INSETS_RIGHT_BORDER;
+		}
+		add(component, c);
+		c.gridx = ++c.gridx % 4;
+		c.gridy = c.gridx == 0 ? ++c.gridy : c.gridy;
 	}
 }

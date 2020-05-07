@@ -67,4 +67,12 @@ public class HistoryPanel extends JPanel
 		repaint();
 		revalidate();
 	}
+
+	protected void clearHistory()
+	{
+		removeAll();
+		itemPanels.clear();
+		repaint();
+		revalidate();
+	}
 }
