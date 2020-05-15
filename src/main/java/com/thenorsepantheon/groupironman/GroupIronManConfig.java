@@ -3,6 +3,8 @@ package com.thenorsepantheon.groupironman;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.Range;
+import net.runelite.client.config.Units;
 
 @ConfigGroup("groupironman")
 public interface GroupIronManConfig extends Config
@@ -26,5 +28,18 @@ public interface GroupIronManConfig extends Config
 	default String groupMembers()
 	{
 		return "";
+	}
+
+	@ConfigItem(
+		position = 3,
+		keyName = "iconHueOffset",
+		name = "Icon Hue Offset",
+		description = "Set the hue offset for iron man icons"
+	)
+	@Units(Units.PERCENT)
+	@Range(max = 100)
+	default int iconHueOffset()
+	{
+		return 50;
 	}
 }
