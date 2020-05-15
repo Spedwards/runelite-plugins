@@ -104,7 +104,7 @@ public class GroupIronManPlugin extends Plugin
 	{
 		String target = Text.removeTags(event.getMenuTarget());
 
-		if (entryMatches(event, "Trade with") && !groupMembers.contains(cleanName(event.getMenuTarget())))
+		if ((entryMatches(event, "Trade with") || entryMatches(event, "Accept trade")) && !isGroupMember(event.getMenuTarget()))
 		{
 			// Scold the player for attempting to trade with a non-group member
 			event.consume();
@@ -112,7 +112,7 @@ public class GroupIronManPlugin extends Plugin
 			return;
 		}
 
-		if (entryMatches(event, "Challenge") && !groupMembers.contains(cleanName(event.getMenuTarget())))
+		if (entryMatches(event, "Challenge") && !isGroupMember(event.getMenuTarget()))
 		{
 			event.consume();
 			sendChatMessage("As a Group Iron Man, you cannot duel players outside your group.");
@@ -204,7 +204,7 @@ public class GroupIronManPlugin extends Plugin
 				}
 			}
 
-			if (groupMembers.contains(cleanName(entry.getTarget())))
+			if (isGroupMember(entry.getTarget()))
 			{
 				entry.setTarget(getImgTag() + entry.getTarget());
 			}
@@ -242,7 +242,7 @@ public class GroupIronManPlugin extends Plugin
 
 		boolean isLocalPlayer = Text.standardize(event.getName()).equalsIgnoreCase(Text.standardize(client.getLocalPlayer().getName()));
 
-		if (isLocalPlayer || groupMembers.contains(Text.standardize(event.getName().toLowerCase())))
+		if (isLocalPlayer || isGroupMember(event.getName().toLowerCase()))
 		{
 			event.getMessageNode().setName(getImgTag() + Text.removeTags(event.getName()));
 		}
@@ -281,13 +281,22 @@ public class GroupIronManPlugin extends Plugin
 
 	private String cleanName(String playerName)
 	{
-		playerName = Text.standardize(playerName);
 		int index = playerName.indexOf('(');
 		if (index == -1)
 		{
-			return playerName.trim();
+			return standardizeToJagexName(playerName);
 		}
-		return playerName.substring(0, index).trim();
+		return standardizeToJagexName(playerName.substring(0, index));
+	}
+
+	private String standardizeToJagexName(String name)
+	{
+		return Text.standardize(Text.toJagexName(name));
+	}
+
+	private boolean isGroupMember(String name)
+	{
+		return groupMembers.contains(cleanName(name));
 	}
 
 	private void populateGroupMembers()
@@ -295,7 +304,9 @@ public class GroupIronManPlugin extends Plugin
 		Splitter NEWLINE_SPLITTER = Splitter.on("\n").omitEmptyStrings().trimResults();
 
 		groupMembers.clear();
-		groupMembers.addAll(NEWLINE_SPLITTER.splitToList(config.groupMembers()));
+		groupMembers.addAll(
+			NEWLINE_SPLITTER.splitToList(config.groupMembers())
+				.stream().map(this::standardizeToJagexName).collect(Collectors.toList()));
 	}
 
 	private boolean entryMatches(MenuEntry entry, String option)
