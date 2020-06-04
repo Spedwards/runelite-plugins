@@ -43,6 +43,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
+import net.runelite.http.api.worlds.WorldResult;
 
 @Slf4j
 class ProfilePanel extends JPanel
@@ -111,7 +112,7 @@ class ProfilePanel extends JPanel
 		panelActions.add(delete, BorderLayout.EAST);
 
 		JLabel label = new JLabel();
-		label.setText(profile.getLabel());
+		label.setText(formatLabel(profile, config.isStreamerMode()));
 		label.setBorder(null);
 		label.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		label.setPreferredSize(new Dimension(0, 24));
@@ -133,6 +134,14 @@ class ProfilePanel extends JPanel
 				if (SwingUtilities.isLeftMouseButton(e) && client.getGameState() == GameState.LOGIN_SCREEN)
 				{
 					client.setUsername(loginText);
+					if (profile.getWorld() != null)
+					{
+						int world = profile.getWorld();
+						if (world > 300 && client.getWorld() != world)
+						{
+							client.changeWorld(ProfilesPlugin.findWorld(client, profile.getWorld()));
+						}
+					}
 				}
 				if (profile.getPassword() != null && !profile.isEncrypted())
 				{
@@ -158,5 +167,14 @@ class ProfilePanel extends JPanel
 
 		add(labelWrapper, BorderLayout.NORTH);
 		add(bottomContainer, BorderLayout.CENTER);
+	}
+
+	private String formatLabel(Profile profile, boolean hiddenWorld)
+	{
+		if (hiddenWorld || profile.getWorld() == null)
+		{
+			return profile.getLabel();
+		}
+		return profile.getLabel() + " (W" + profile.getWorld() + ")";
 	}
 }

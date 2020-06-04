@@ -41,20 +41,22 @@ public class Profile
 
 	private final String label;
 	private final String login;
+	private final Integer world;
 	@Setter
 	private String password;
 	@Setter
 	private boolean encrypted;
 
-	public Profile(String label, String login, String password)
+	public Profile(String label, String login, Integer world, String password)
 	{
-		this(label, login, password, true);
+		this(label, login, world, password, true);
 	}
 
-	public Profile(String label, String login, String password, boolean encrypted)
+	public Profile(String label, String login, Integer world, String password, boolean encrypted)
 	{
 		this.label = label;
 		this.login = login;
+		this.world = world;
 		this.password = password;
 		this.encrypted = encrypted;
 		profiles.add(this);

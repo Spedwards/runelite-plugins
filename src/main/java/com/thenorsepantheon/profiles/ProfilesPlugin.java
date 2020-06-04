@@ -28,16 +28,19 @@ import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.World;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
-
 import java.awt.image.BufferedImage;
+import net.runelite.client.util.WorldUtil;
+import net.runelite.http.api.worlds.WorldResult;
 
 @Slf4j
 @PluginDescriptor(
@@ -50,6 +53,9 @@ public class ProfilesPlugin extends Plugin
 	private Client client;
 
 	@Inject
+	private WorldService worldService;
+
+	@Inject
 	private ProfilesConfig config;
 
 	@Inject
@@ -57,6 +63,8 @@ public class ProfilesPlugin extends Plugin
 
 	private ProfilesPanel panel;
 	private NavigationButton navButton;
+
+	private static ProfilesPlugin INSTANCE;
 
 	@Provides
 	ProfilesConfig provideConfig(ConfigManager configManager)
@@ -67,6 +75,7 @@ public class ProfilesPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
+		INSTANCE = this;
 		ProfilesStorage.loadProfiles();
 
 		panel = new ProfilesPanel(client, config);
@@ -95,6 +104,40 @@ public class ProfilesPlugin extends Plugin
 		if (event.getGroup().equals("profiles"))
 		{
 			panel.redrawProfiles();
+		}
+	}
+
+	protected static World findWorld(Client client, Integer worldInt)
+	{
+		if (worldInt == null)
+		{
+			return null;
+		}
+
+		final WorldResult worldResult = ProfilesPlugin.INSTANCE.worldService.getWorlds();
+		if (worldResult == null)
+		{
+			log.warn("Failed to lookup worlds.");
+			return null;
+		}
+		final net.runelite.http.api.worlds.World world = worldResult.findWorld(worldInt);
+
+		if (world != null)
+		{
+			final World rsWorld = client.createWorld();
+			rsWorld.setActivity(world.getActivity());
+			rsWorld.setAddress(world.getAddress());
+			rsWorld.setId(world.getId());
+			rsWorld.setPlayerCount(world.getPlayers());
+			rsWorld.setLocation(world.getLocation());
+			rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
+
+			return rsWorld;
+		}
+		else
+		{
+			log.warn("World {} not found.", worldInt);
+			return null;
 		}
 	}
 

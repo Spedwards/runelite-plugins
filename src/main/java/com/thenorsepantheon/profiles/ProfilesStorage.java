@@ -79,7 +79,7 @@ public class ProfilesStorage
 
 		Gson gson = new Gson();
 		List<Profile> profiles = gson.fromJson(new FileReader(file), new TypeToken<List<Profile>>(){}.getType());
-		profiles.forEach(p -> new Profile(p.getLabel(), p.getLogin(), p.getPassword()));
+		profiles.forEach(p -> new Profile(p.getLabel(), p.getLogin(), p.getWorld(), p.getPassword()));
 
 		hasLoaded = true;
 	}

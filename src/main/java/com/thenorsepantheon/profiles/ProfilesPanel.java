@@ -34,6 +34,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import javax.inject.Inject;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
@@ -48,6 +49,7 @@ class ProfilesPanel extends PluginPanel
 
 	private static final String ENCRYPTION_PASSWORD = "Encryption Password";
 	private static final String ACCOUNT_USERNAME = "Account Username";
+	private static final String ACCOUNT_WORLD = "Account World";
 	private static final String ACCOUNT_PASSWORD = "Account Password (optional)";
 	private static final String ACCOUNT_LABEL = "Account Label";
 
@@ -57,6 +59,7 @@ class ProfilesPanel extends PluginPanel
 	private final PasswordField pswdEncryptionPassword = new PasswordField(ENCRYPTION_PASSWORD);
 	private final TextField txtAccountLabel = new TextField(ACCOUNT_LABEL);
 	private final PasswordField txtAccountLogin;
+	private final PasswordField txtAccountWorld;
 	private final PasswordField pswdAccountPassword = new PasswordField(ACCOUNT_PASSWORD);
 	private final JPanel profilesPanel = new JPanel();
 	private final GridBagConstraints c;
@@ -114,8 +117,12 @@ class ProfilesPanel extends PluginPanel
 		c.gridy++;
 
 		txtAccountLogin = new PasswordField(ACCOUNT_USERNAME, profilesConfig.isStreamerMode());
+		txtAccountWorld = new PasswordField(ACCOUNT_WORLD, profilesConfig.isStreamerMode());
 
 		add(txtAccountLogin, c);
+		c.gridy++;
+
+		add(txtAccountWorld, c);
 		c.gridy++;
 
 		pswdAccountPassword.setEnabled(false);
@@ -130,16 +137,25 @@ class ProfilesPanel extends PluginPanel
 		{
 			String labelText = txtAccountLabel.getText();
 			String loginText = String.valueOf(txtAccountLogin.getPassword());
+			String worldText = String.valueOf(txtAccountWorld.getPassword());
 			String passwordText = String.valueOf(pswdAccountPassword.getPassword());
 			if (labelText.equals(ACCOUNT_LABEL) || loginText.equals(ACCOUNT_USERNAME))
 			{
 				return;
 			}
+			if (!worldText.matches("\\d+") && !worldText.equals(ACCOUNT_WORLD)) {
+				JOptionPane.showMessageDialog(ProfilesPanel.this,
+					"The world entered is not an integer.",
+					"Error",
+					JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			Integer world = worldText.equals(ACCOUNT_WORLD) ? null : Integer.parseInt(worldText);
 			if (passwordText.equals(ACCOUNT_PASSWORD))
 			{
 				passwordText = null;
 			}
-			Profile profile = new Profile(labelText, loginText, passwordText, Profile.getEncryptionPassword() == null);
+			Profile profile = new Profile(labelText, loginText, world, passwordText, Profile.getEncryptionPassword() == null);
 			this.addProfile(profile);
 			try
 			{
@@ -152,6 +168,7 @@ class ProfilesPanel extends PluginPanel
 
 			txtAccountLabel.resetState();
 			txtAccountLogin.resetState();
+			txtAccountWorld.resetState();
 			pswdAccountPassword.resetState();
 		});
 
@@ -182,6 +199,7 @@ class ProfilesPanel extends PluginPanel
 	void redrawProfiles()
 	{
 		txtAccountLogin.setObfuscate(profilesConfig.isStreamerMode());
+		txtAccountWorld.setObfuscate(profilesConfig.isStreamerMode());
 		profilesPanel.removeAll();
 		c.gridy = 0;
 		Profile.getProfiles().forEach(this::addProfile);
