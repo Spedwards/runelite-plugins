@@ -41,6 +41,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.events.UsernameChanged;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 
@@ -59,7 +61,7 @@ class ProfilePanel extends JPanel
 
 	private final String loginText;
 
-	ProfilePanel(final Client client, Profile profile, ProfilesConfig config, ProfilesPanel parent)
+	ProfilePanel(final Client client, final EventBus eventBus, Profile profile, ProfilesConfig config, ProfilesPanel parent)
 	{
 		this.loginText = profile.getLogin();
 
@@ -133,6 +135,7 @@ class ProfilePanel extends JPanel
 				if (SwingUtilities.isLeftMouseButton(e) && client.getGameState() == GameState.LOGIN_SCREEN)
 				{
 					client.setUsername(loginText);
+					eventBus.post(new UsernameChanged());
 					if (profile.getWorld() != null)
 					{
 						int world = profile.getWorld();

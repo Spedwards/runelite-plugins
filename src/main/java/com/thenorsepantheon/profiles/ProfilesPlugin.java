@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.World;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.WorldService;
@@ -61,6 +62,9 @@ public class ProfilesPlugin extends Plugin
 	@Inject
 	private ClientToolbar clientToolbar;
 
+	@Inject
+	private EventBus eventBus;
+
 	private ProfilesPanel panel;
 	private NavigationButton navButton;
 
@@ -78,7 +82,7 @@ public class ProfilesPlugin extends Plugin
 		INSTANCE = this;
 		ProfilesStorage.loadProfiles();
 
-		panel = new ProfilesPanel(client, config);
+		panel = new ProfilesPanel(client, eventBus, config);
 
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "profiles_icon.png");
 

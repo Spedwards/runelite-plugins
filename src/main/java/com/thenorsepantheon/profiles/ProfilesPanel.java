@@ -39,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
@@ -51,6 +52,7 @@ class ProfilesPanel extends PluginPanel
 	private static final String ACCOUNT_LABEL = "Account Label";
 
 	private final Client client;
+	private final EventBus eventBus;
 	private static ProfilesConfig profilesConfig;
 
 	private final TextField txtAccountLabel = new TextField(ACCOUNT_LABEL);
@@ -60,10 +62,11 @@ class ProfilesPanel extends PluginPanel
 	private final GridBagConstraints c;
 
 	@Inject
-	public ProfilesPanel(Client client, ProfilesConfig config)
+	public ProfilesPanel(Client client, EventBus eventBus, ProfilesConfig config)
 	{
 		super();
 		this.client = client;
+		this.eventBus = eventBus;
 		profilesConfig = config;
 
 		setBorder(new EmptyBorder(18, 10, 0, 10));
@@ -161,7 +164,7 @@ class ProfilesPanel extends PluginPanel
 
 	private void addProfile(Profile profile)
 	{
-		ProfilePanel profilePanel = new ProfilePanel(client, profile, profilesConfig, this);
+		ProfilePanel profilePanel = new ProfilePanel(client, eventBus, profile, profilesConfig, this);
 		c.gridy++;
 		profilesPanel.add(profilePanel, c);
 
