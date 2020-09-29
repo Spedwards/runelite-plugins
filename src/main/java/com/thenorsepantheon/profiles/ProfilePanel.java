@@ -43,7 +43,6 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
-import net.runelite.http.api.worlds.WorldResult;
 
 @Slf4j
 class ProfilePanel extends JPanel
@@ -142,14 +141,6 @@ class ProfilePanel extends JPanel
 							client.changeWorld(ProfilesPlugin.findWorld(client, profile.getWorld()));
 						}
 					}
-				}
-				if (profile.getPassword() != null && !profile.isEncrypted())
-				{
-					client.setPassword(profile.getPassword());
-				}
-				else
-				{
-					client.setPassword("");
 				}
 			}
 		};

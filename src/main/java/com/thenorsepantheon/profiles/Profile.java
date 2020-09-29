@@ -27,7 +27,6 @@ package com.thenorsepantheon.profiles;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class Profile
@@ -35,55 +34,16 @@ public class Profile
 	@Getter
 	private static final List<Profile> profiles = new ArrayList<>();
 
-	@Getter
-	@Setter
-	private static String encryptionPassword = null;
-
 	private final String label;
 	private final String login;
 	private final Integer world;
-	@Setter
-	private String password;
-	@Setter
-	private boolean encrypted;
 
-	public Profile(String label, String login, Integer world, String password)
-	{
-		this(label, login, world, password, true);
-	}
 
-	public Profile(String label, String login, Integer world, String password, boolean encrypted)
+	public Profile(String label, String login, Integer world)
 	{
 		this.label = label;
 		this.login = login;
 		this.world = world;
-		this.password = password;
-		this.encrypted = encrypted;
 		profiles.add(this);
-	}
-
-	protected void encrypt()
-	{
-		if (this.getPassword() != null && !this.isEncrypted() && getEncryptionPassword() != null)
-		{
-			this.setPassword(AES.encrypt(this.getPassword(), getEncryptionPassword()));
-			this.setEncrypted(true);
-		}
-	}
-
-	protected void decrypt()
-	{
-		if (getEncryptionPassword() != null)
-		{
-			this.setPassword(AES.decrypt(this.getPassword(), getEncryptionPassword()));
-			this.setEncrypted(false);
-		}
-	}
-
-	static void decryptPasswords()
-	{
-		profiles.stream().filter(profile ->
-			profile.getPassword() != null && profile.isEncrypted()
-		).forEach(Profile::decrypt);
 	}
 }

@@ -56,12 +56,9 @@ public class ProfilesStorage
 
 		Gson gson = new Gson();
 		Writer writer = new FileWriter(file);
-		List<Profile> profiles = Profile.getProfiles();
-		profiles.forEach(Profile::encrypt);
-		gson.toJson(profiles, writer);
+		gson.toJson(Profile.getProfiles(), writer);
 		writer.flush();
 		writer.close();
-		profiles.forEach(Profile::decrypt);
 	}
 
 	static void loadProfiles() throws IOException
@@ -79,7 +76,7 @@ public class ProfilesStorage
 
 		Gson gson = new Gson();
 		List<Profile> profiles = gson.fromJson(new FileReader(file), new TypeToken<List<Profile>>(){}.getType());
-		profiles.forEach(p -> new Profile(p.getLabel(), p.getLogin(), p.getWorld(), p.getPassword()));
+		profiles.forEach(p -> new Profile(p.getLabel(), p.getLogin(), p.getWorld()));
 
 		hasLoaded = true;
 	}
