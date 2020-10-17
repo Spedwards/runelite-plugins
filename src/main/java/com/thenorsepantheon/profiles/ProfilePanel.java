@@ -131,6 +131,8 @@ class ProfilePanel extends JPanel
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
+				labelWrapper.setBackground(ColorScheme.MEDIUM_GRAY_COLOR);
+				bottomContainer.setBackground(ColorScheme.MEDIUM_GRAY_COLOR);
 				if (SwingUtilities.isLeftMouseButton(e) && client.getGameState() == GameState.LOGIN_SCREEN)
 				{
 					client.setUsername(loginText);
@@ -151,6 +153,25 @@ class ProfilePanel extends JPanel
 				{
 					client.setPassword("");
 				}
+			}
+			@Override
+			public void mouseReleased(MouseEvent e){
+				labelWrapper.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
+				bottomContainer.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e)
+			{
+				labelWrapper.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
+				bottomContainer.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e)
+			{
+				labelWrapper.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+				bottomContainer.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 			}
 		};
 		label.addMouseListener(clickAdapter);
