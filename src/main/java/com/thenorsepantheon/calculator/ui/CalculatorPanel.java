@@ -172,49 +172,19 @@ public class CalculatorPanel extends JPanel
 					// If there is no action saved, assume we're working with num1
 					if (displayField.getCalculatorAction() == null)
 					{
-						Integer num1 = displayField.getNum1();
-						if (num1 == 0)
-						{
-							if (displayField.num1IsNegativeZero())
-							{
-								num *= -1;
-							}
-							displayField.setNum1(num);
-						}
-						else
-						{
-							if (num1 < 0)
-							{
-								displayField.setNum1(num1 * 10 - num);
-							}
-							else
-							{
-								displayField.setNum1(num1 * 10 + num);
-							}
-						}
+						displayField.setNum1(
+							getNewNumber(
+								displayField.getNum1(),
+								num,
+								displayField.num1IsNegativeZero()));
 					}
 					else
 					{
-						Integer num2 = displayField.getNum2();
-						if (num2 == null || num2 == 0)
-						{
-							if (displayField.num2IsNegativeZero())
-							{
-								num *= -1;
-							}
-							displayField.setNum2(num);
-						}
-						else
-						{
-							if (num2 < 0)
-							{
-								displayField.setNum2(num2 * 10 - num);
-							}
-							else
-							{
-								displayField.setNum2(num2 * 10 + num);
-							}
-						}
+						displayField.setNum2(
+							getNewNumber(
+								displayField.getNum2(),
+								num,
+								displayField.num2IsNegativeZero()));
 					}
 				}
 			}
@@ -252,6 +222,54 @@ public class CalculatorPanel extends JPanel
 			displayField.update();
 		});
 		addComp(btn);
+	}
+
+	private int getNewNumber(Integer oldNum, int newNum, boolean isNegativeZero)
+	{
+		if (oldNum == null || oldNum == 0)
+		{
+			if (isNegativeZero)
+			{
+				return newNum * -1;
+			}
+			return newNum;
+		}
+		else
+		{
+			if (oldNum < 0)
+			{
+				if (oldNum < Integer.MIN_VALUE / 10)
+				{
+					return Integer.MIN_VALUE;
+				}
+				try
+				{
+					return Math.subtractExact(oldNum * 10, newNum);
+				}
+				catch (ArithmeticException e)
+				{
+					return Integer.MIN_VALUE;
+				}
+			}
+			else
+			{
+				if (oldNum > Integer.MAX_VALUE / 10)
+				{
+					return Integer.MAX_VALUE;
+				}
+				else
+				{
+					try
+					{
+						return Math.addExact(oldNum * 10, newNum);
+					}
+					catch (ArithmeticException e)
+					{
+						return Integer.MAX_VALUE;
+					}
+				}
+			}
+		}
 	}
 
 	private void addComp(Component component)
