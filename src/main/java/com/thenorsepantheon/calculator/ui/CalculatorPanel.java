@@ -145,7 +145,7 @@ public class CalculatorPanel extends JPanel
 				displayField.calculateResult();
 				if (displayField.getResult() == null)
 				{
-					// Divide by 0 error occured
+					// Divide by 0 or overflow error occured
 					return;
 				}
 				// Add new calculation to history before the displayField is updated

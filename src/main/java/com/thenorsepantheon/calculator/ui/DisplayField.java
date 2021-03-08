@@ -60,13 +60,40 @@ public class DisplayField extends JTextField
 		switch (calculatorAction)
 		{
 			case ADDITION:
-				result = num1 + num2;
+				try
+				{
+					result = Math.addExact(num1, num2);
+				}
+				catch (ArithmeticException e)
+				{
+					reset();
+					super.setText("Error: Addition overflow!");
+					finished = true;
+				}
 				break;
 			case SUBTRACTION:
-				result = num1 - num2;
+				try
+				{
+					result = Math.subtractExact(num1, num2);
+				}
+				catch (ArithmeticException e)
+				{
+					reset();
+					super.setText("Error: Subtraction overflow!");
+					finished = true;
+				}
 				break;
 			case MULTIPLICATION:
-				result = num1 * num2;
+				try
+				{
+					result = Math.multiplyExact(num1, num2);
+				}
+				catch (ArithmeticException e)
+				{
+					reset();
+					super.setText("Error: Multiplication overflow!");
+					finished = true;
+				}
 				break;
 			case DIVISION:
 				if (num2 == 0)
