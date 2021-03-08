@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import net.runelite.client.util.ImageUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -62,11 +63,14 @@ public class CalculatorPanel extends JPanel
 		this.displayField = panel.getDisplayField();
 
 		setLayout(new GridBagLayout());
+		setBorder(new EmptyBorder(0, 1, 0, 1));
 
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
+		c.weightx = 1;
+		c.weighty = 1;
 
 		CalculatorButton plusMinus = new CalculatorButton(PLUS_MINUS_ICON);
 

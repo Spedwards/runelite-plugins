@@ -34,12 +34,14 @@ import lombok.extern.slf4j.Slf4j;
 public class CalculatorButton extends JButton
 {
 	private static final Dimension PREFERRED_SIZE = new Dimension(55, 55);
+	private static final Dimension MINIMUM_SIZE = new Dimension(54, 55);
 
 	public CalculatorButton(String text)
 	{
 		super(text);
 
 		setPreferredSize(PREFERRED_SIZE);
+		setMinimumSize(MINIMUM_SIZE);
 		// Use Arial. Zero and Asterisk look funny in "Runescape Standard"
 		setFont(new Font("Arial", Font.BOLD, 20));
 	}
@@ -49,5 +51,6 @@ public class CalculatorButton extends JButton
 		super(icon);
 
 		setPreferredSize(PREFERRED_SIZE);
+		setMinimumSize(MINIMUM_SIZE);
 	}
 }
