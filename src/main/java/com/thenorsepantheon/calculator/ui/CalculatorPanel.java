@@ -238,40 +238,27 @@ public class CalculatorPanel extends JPanel
 			}
 			return newNum;
 		}
+
+		if (oldNum < 0)
+		{
+			try
+			{
+				return Math.subtractExact(Math.multiplyExact(oldNum, 10), newNum);
+			}
+			catch (ArithmeticException e)
+			{
+				return Integer.MIN_VALUE;
+			}
+		}
 		else
 		{
-			if (oldNum < 0)
+			try
 			{
-				if (oldNum < Integer.MIN_VALUE / 10)
-				{
-					return Integer.MIN_VALUE;
-				}
-				try
-				{
-					return Math.subtractExact(oldNum * 10, newNum);
-				}
-				catch (ArithmeticException e)
-				{
-					return Integer.MIN_VALUE;
-				}
+				return Math.addExact(Math.multiplyExact(oldNum, 10), newNum);
 			}
-			else
+			catch (ArithmeticException e)
 			{
-				if (oldNum > Integer.MAX_VALUE / 10)
-				{
-					return Integer.MAX_VALUE;
-				}
-				else
-				{
-					try
-					{
-						return Math.addExact(oldNum * 10, newNum);
-					}
-					catch (ArithmeticException e)
-					{
-						return Integer.MAX_VALUE;
-					}
-				}
+				return Integer.MAX_VALUE;
 			}
 		}
 	}
