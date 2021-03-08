@@ -46,7 +46,7 @@ public class CalculatorPanel extends JPanel
 
 	static
 	{
-		final BufferedImage plusMinusIcon = ImageUtil.resizeImage(ImageUtil.getResourceStreamFromClass(CalculatorPlugin.class, "plus_minus_icon.png"), 25, 25);
+		final BufferedImage plusMinusIcon = ImageUtil.resizeImage(ImageUtil.loadImageResource(CalculatorPlugin.class, "plus_minus_icon.png"), 25, 25);
 		PLUS_MINUS_ICON = new ImageIcon(plusMinusIcon);
 	}
 
