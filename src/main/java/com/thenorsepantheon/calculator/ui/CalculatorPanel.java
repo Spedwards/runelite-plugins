@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import net.runelite.client.util.ImageUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,7 +47,7 @@ public class CalculatorPanel extends JPanel
 
 	static
 	{
-		final BufferedImage plusMinusIcon = ImageUtil.resizeImage(ImageUtil.getResourceStreamFromClass(CalculatorPlugin.class, "plus_minus_icon.png"), 25, 25);
+		final BufferedImage plusMinusIcon = ImageUtil.resizeImage(ImageUtil.loadImageResource(CalculatorPlugin.class, "plus_minus_icon.png"), 25, 25);
 		PLUS_MINUS_ICON = new ImageIcon(plusMinusIcon);
 	}
 
@@ -62,11 +63,14 @@ public class CalculatorPanel extends JPanel
 		this.displayField = panel.getDisplayField();
 
 		setLayout(new GridBagLayout());
+		setBorder(new EmptyBorder(0, 1, 0, 1));
 
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
+		c.weightx = 1;
+		c.weighty = 1;
 
 		CalculatorButton plusMinus = new CalculatorButton(PLUS_MINUS_ICON);
 
@@ -141,7 +145,7 @@ public class CalculatorPanel extends JPanel
 				displayField.calculateResult();
 				if (displayField.getResult() == null)
 				{
-					// Divide by 0 error occured
+					// Divide by 0 or overflow error occured
 					return;
 				}
 				// Add new calculation to history before the displayField is updated
@@ -172,49 +176,19 @@ public class CalculatorPanel extends JPanel
 					// If there is no action saved, assume we're working with num1
 					if (displayField.getCalculatorAction() == null)
 					{
-						Integer num1 = displayField.getNum1();
-						if (num1 == 0)
-						{
-							if (displayField.num1IsNegativeZero())
-							{
-								num *= -1;
-							}
-							displayField.setNum1(num);
-						}
-						else
-						{
-							if (num1 < 0)
-							{
-								displayField.setNum1(num1 * 10 - num);
-							}
-							else
-							{
-								displayField.setNum1(num1 * 10 + num);
-							}
-						}
+						displayField.setNum1(
+							getNewNumber(
+								displayField.getNum1(),
+								num,
+								displayField.num1IsNegativeZero()));
 					}
 					else
 					{
-						Integer num2 = displayField.getNum2();
-						if (num2 == null || num2 == 0)
-						{
-							if (displayField.num2IsNegativeZero())
-							{
-								num *= -1;
-							}
-							displayField.setNum2(num);
-						}
-						else
-						{
-							if (num2 < 0)
-							{
-								displayField.setNum2(num2 * 10 - num);
-							}
-							else
-							{
-								displayField.setNum2(num2 * 10 + num);
-							}
-						}
+						displayField.setNum2(
+							getNewNumber(
+								displayField.getNum2(),
+								num,
+								displayField.num2IsNegativeZero()));
 					}
 				}
 			}
@@ -252,6 +226,41 @@ public class CalculatorPanel extends JPanel
 			displayField.update();
 		});
 		addComp(btn);
+	}
+
+	private int getNewNumber(Integer oldNum, int newNum, boolean isNegativeZero)
+	{
+		if (oldNum == null || oldNum == 0)
+		{
+			if (isNegativeZero)
+			{
+				return newNum * -1;
+			}
+			return newNum;
+		}
+
+		if (oldNum < 0)
+		{
+			try
+			{
+				return Math.subtractExact(Math.multiplyExact(oldNum, 10), newNum);
+			}
+			catch (ArithmeticException e)
+			{
+				return Integer.MIN_VALUE;
+			}
+		}
+		else
+		{
+			try
+			{
+				return Math.addExact(Math.multiplyExact(oldNum, 10), newNum);
+			}
+			catch (ArithmeticException e)
+			{
+				return Integer.MAX_VALUE;
+			}
+		}
 	}
 
 	private void addComp(Component component)
