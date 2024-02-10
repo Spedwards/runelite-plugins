@@ -5,28 +5,25 @@ plugins {
 repositories {
 	mavenLocal()
 	maven {
-		url = 'http://repo.runelite.net'
+		url = 'https://repo.runelite.net'
 	}
 	mavenCentral()
 }
 
-def runeLiteVersion = '1.6.12'
+def runeLiteVersion = '1.10.21.2'
 
 dependencies {
-	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
+    compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
+    compileOnly 'org.projectlombok:lombok:1.18.4'
+    annotationProcessor 'org.projectlombok:lombok:1.18.4'
 
-	compileOnly 'org.projectlombok:lombok:1.18.4'
-	annotationProcessor 'org.projectlombok:lombok:1.18.4'
-
-	testImplementation 'junit:junit:4.12'
-	testImplementation 'org.slf4j:slf4j-simple:1.7.12'
-	testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion, {
-		exclude group: 'ch.qos.logback', module: 'logback-classic'
-	}
+    testImplementation group: 'net.runelite', name: 'client', version: runeLiteVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.7.1'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.9.0'
 }
 
 group = 'com.thenorsepantheon.profiles'
-version = '1.1.4'
+version = '1.1.5'
 sourceCompatibility = '1.8'
 
 tasks.withType(JavaCompile) {
