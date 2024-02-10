@@ -33,11 +33,14 @@ import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.ProfileManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
@@ -49,7 +52,10 @@ class ProfilesPanel extends PluginPanel
 	private static final String ACCOUNT_LABEL = "Account Label";
 
 	private final Client client;
-	private static ProfilesConfig profilesConfig;
+	private ProfilesConfig profilesConfig;
+	private ConfigManager configManager;
+	private ProfileManager profileManager;
+	private ScheduledExecutorService executor;
 
 	private final TextField txtAccountLabel = new TextField(ACCOUNT_LABEL);
 	private final PasswordField txtAccountLogin;
@@ -57,11 +63,14 @@ class ProfilesPanel extends PluginPanel
 	private final GridBagConstraints c;
 
 	@Inject
-	public ProfilesPanel(Client client, ProfilesConfig config)
+	public ProfilesPanel(Client client, ProfilesConfig config, ConfigManager configManager, ProfileManager profileManager, ScheduledExecutorService	executor)
 	{
 		super();
 		this.client = client;
-		profilesConfig = config;
+		this.profilesConfig = config;
+		this.configManager = configManager;
+		this.profileManager = profileManager;
+		this.executor = executor;
 
 		setBorder(new EmptyBorder(18, 10, 0, 10));
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
@@ -78,7 +87,7 @@ class ProfilesPanel extends PluginPanel
 		add(txtAccountLabel, c);
 		c.gridy++;
 
-		txtAccountLogin = new PasswordField(ACCOUNT_USERNAME, profilesConfig.isStreamerMode());
+		txtAccountLogin = new PasswordField(ACCOUNT_USERNAME, config.isStreamerMode());
 
 		add(txtAccountLogin, c);
 		c.gridy++;
@@ -142,7 +151,7 @@ class ProfilesPanel extends PluginPanel
 
 	private void addProfile(Profile profile)
 	{
-		ProfilePanel profilePanel = new ProfilePanel(client, profile, profilesConfig, this);
+		ProfilePanel profilePanel = new ProfilePanel(client, profile, profilesConfig, this, configManager, profileManager, executor);
 		c.gridy++;
 		profilesPanel.add(profilePanel, c);
 

@@ -30,6 +30,7 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.ScheduledExecutorService;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -41,6 +42,10 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.client.account.SessionManager;
+import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.ConfigProfile;
+import net.runelite.client.config.ProfileManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 
@@ -57,11 +62,23 @@ class ProfilePanel extends JPanel
 		DELETE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(deleteImg, -100));
 	}
 
-	private final String loginText;
+	private final Client client;
+	private final ProfilesConfig config;
+	private final ConfigManager configManager;
+	private final ProfileManager profileManager;
+	private final ScheduledExecutorService executor;
 
-	ProfilePanel(final Client client, Profile profile, ProfilesConfig config, ProfilesPanel parent)
+
+	ProfilePanel(Client client, Profile profile, ProfilesConfig config, ProfilesPanel parent, ConfigManager configManager, ProfileManager profileManager, ScheduledExecutorService executor)
 	{
-		this.loginText = profile.getLogin();
+		this.client = client;
+		this.config = config;
+		this.configManager = configManager;
+		this.profileManager = profileManager;
+		this.executor = executor;
+
+		String loginText = profile.getLogin();
+		String profileLabel = profile.getLabel();
 
 		final ProfilePanel panel = this;
 
@@ -127,7 +144,7 @@ class ProfilePanel extends JPanel
 			{
 				if (SwingUtilities.isLeftMouseButton(e) && client.getGameState() == GameState.LOGIN_SCREEN)
 				{
-					client.setUsername(loginText);
+					setLoginText(loginText, profileLabel);
 				}
 			}
 		});
@@ -142,7 +159,7 @@ class ProfilePanel extends JPanel
 			{
 				if (SwingUtilities.isLeftMouseButton(e) && client.getGameState() == GameState.LOGIN_SCREEN)
 				{
-					client.setUsername(loginText);
+					setLoginText(loginText, profileLabel);
 				}
 			}
 		});
@@ -158,5 +175,24 @@ class ProfilePanel extends JPanel
 
 		add(labelWrapper, BorderLayout.NORTH);
 		add(bottomContainer, BorderLayout.CENTER);
+	}
+
+	private void setLoginText(String loginText, String profileLabel)
+	{
+		client.setUsername(loginText);
+
+		if (config.switchProfile())
+		{
+			ConfigProfile configProfile;
+			try (ProfileManager.Lock lock = profileManager.lock())
+			{
+				configProfile = lock.findProfile(profileLabel);
+			}
+
+			if (configProfile != null)
+			{
+				executor.submit(() -> configManager.switchProfile(configProfile));
+			}
+		}
 	}
 }

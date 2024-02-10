@@ -25,10 +25,12 @@
 package com.thenorsepantheon.profiles;
 
 import com.google.inject.Provides;
+import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.ProfileManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
@@ -55,6 +57,15 @@ public class ProfilesPlugin extends Plugin
 	@Inject
 	private ClientToolbar clientToolbar;
 
+	@Inject
+	private ConfigManager configManager;
+
+	@Inject
+	private ProfileManager profileManager;
+
+	@Inject
+	private ScheduledExecutorService executorService;
+
 	private ProfilesPanel panel;
 	private NavigationButton navButton;
 
@@ -69,7 +80,7 @@ public class ProfilesPlugin extends Plugin
 	{
 		ProfilesStorage.loadProfiles();
 
-		panel = new ProfilesPanel(client, config);
+		panel = new ProfilesPanel(client, config, configManager, profileManager, executorService);
 
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "profiles_icon.png");
 

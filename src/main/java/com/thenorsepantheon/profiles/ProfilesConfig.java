@@ -60,4 +60,14 @@ public interface ProfilesConfig extends Config
 		return false;
 	}
 
+	@ConfigItem(
+		keyName = "switchProfile",
+		name = "Switch Profile",
+		description = "Switches profile on clicking profile"
+	)
+	default boolean switchProfile()
+	{
+		return false;
+	}
+
 }
